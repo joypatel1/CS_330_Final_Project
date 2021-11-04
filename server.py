@@ -19,13 +19,13 @@ except socket.error as e:
     str(e)
 
 # listening for connections
-s.listen()
+s.listen(2)
 print("Please wait to be connected to the server.")
 
 
 # threading function
 def threaded_client(conn):
-    pass
+    conn.send(str.encode("Connected"))
     reply = ""
 
     # continously looking for new connection.
@@ -46,11 +46,14 @@ def threaded_client(conn):
                 print("Received: ", reply)
                 print("Sending: ", reply)
 
-            #encodes data into bytes
+            # encodes data into bytes
             conn.sendall(str.encode(reply))
 
         except:
             break
+
+    print("Connection Closed")
+    conn.close()
 
 
 while True:
