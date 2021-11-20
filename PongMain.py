@@ -86,18 +86,26 @@ while running:
 
     allSprites.draw(screen)
 
-    # check for wall bounce
-    # algorithms for bounce look like
-    # Hits right or left wall? reverse X-bound velocity
-    # Hits top or bottom wall? reverse Y-bound velocity
+    # check for left/right wall bounce - The sequence of events looks like this:
+    # Check if ball hiit wall behind paddle
+    # add to score, if score = 7, break from loop and end game
+    # reset ball, wait for a second
+    # send ball in direction of the play who scored last
+
     if ball.rect.x >= 890:
         scoreLeft += 1
+        if scoreLeft == 7:
+            time.sleep(2)
+            break
         ball.rect.x = 445
         ball.rect.y = 195
         time.sleep(2)
         ball.velocity[0] = -ball.velocity[0]
     if ball.rect.x <= 0:
         scoreRight += 1
+        if scoreRight == 7:
+            time.sleep(2)
+            break
         ball.rect.x = 445
         ball.rect.y = 195
         time.sleep(2)
