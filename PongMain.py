@@ -11,6 +11,8 @@ import pygame
 from paddle import Paddle
 # import ball
 from ball import Ball
+import tkinter as tk
+from tkinter import messagebox
 import time
 
 pygame.init()
@@ -94,7 +96,12 @@ while running:
 
     if ball.rect.x >= 890:
         scoreLeft += 1
+        # messgae box using tkinter, delete the root window as soon as it shows up, then display alert
+        root = tk.Tk()
+        root.withdraw()
+        scoremsg = messagebox.showinfo("Alert", "Red Scored!")
         if scoreLeft == 7:
+            messagebox.showinfo("Alert", "Red Wins!")
             time.sleep(2)
             break
         ball.rect.x = 445
@@ -103,7 +110,11 @@ while running:
         ball.velocity[0] = -ball.velocity[0]
     if ball.rect.x <= 0:
         scoreRight += 1
+        root = tk.Tk()
+        root.withdraw()
+        messagebox.showinfo("Alert", "Blue Scored!")
         if scoreRight == 7:
+            messagebox.showinfo("Alert", "Red Wins!")
             time.sleep(2)
             break
         ball.rect.x = 445
@@ -111,7 +122,7 @@ while running:
         time.sleep(2)
         ball.velocity[0] = -ball.velocity[0]
 
-    # reverse y-bound on collision with top or bottom (the collision with the bottom was causing the lack of angles problem)
+    # reverse y-bound on collision with top or bottom
     if ball.rect.y >= 490:
         ball.velocity[1] = -ball.velocity[1]
     if ball.rect.y <= 0:
