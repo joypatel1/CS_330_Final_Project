@@ -6,8 +6,11 @@
 
 
 # import and initalize pygame library
+import sys
+
 import pygame
 # import paddle sprites
+from network import Network
 from paddle import Paddle
 # import ball
 from ball import Ball
@@ -16,7 +19,7 @@ from tkinter import messagebox
 import time
 
 pygame.init()
-
+pygame.font.init()
 # set local colors: Black for background, white for text, blue and red for teams
 Black = (0, 0, 0)
 White = (255, 255, 255)
@@ -46,123 +49,142 @@ size = (900, 500)
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Multiplayer Pong")
 
-# to the functionality, we will have a while loop that will listen to user inputs, adding logic to the game (score, boundaries, etc.), and refreshing the program
-# global "running" funtion that will control the while loop, simple bool
-running = True
 
-# need a clock for refreshing the screen (included in pygame package)
-clock = pygame.time.Clock()
-
-# scores for each side
-scoreLeft = 0
-scoreRight = 0
-
-# start loop
-while running:
-
-    # --listen for inputs
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:  # if quit button is pressed, leave
-            running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_x:
-                running = False
-
-    # keyboard inputs
-    key = pygame.key.get_pressed()
-    if key[pygame.K_w]:
-        paddleLeft.mUp(5)
-    if key[pygame.K_s]:
-        paddleLeft.mDown(5)
-    if key[pygame.K_UP]:
-        paddleRight.mUp(5)
-    if key[pygame.K_DOWN]:
-        paddleRight.mDown(5)
-
-    # --logic
-    allSprites.update()
-
-    # --drawing here (paddles, screen, scores, boundaries, etc
-    screen.fill(Black)
-    pygame.draw.line(screen, White, [448, 0], [448, 500], 4)
-
-    allSprites.draw(screen)
-
-    # check for left/right wall bounce - The sequence of events looks like this:
-    # Check if ball hiit wall behind paddle
-    # add to score, if score = 7, break from loop and end game
-    # reset ball, wait for a second
-    # send ball in direction of the play who scored last
-
-    if ball.rect.x >= 890:
-        scoreLeft += 1
-        # messgae box using tkinter, delete the root window as soon as it shows up, then display alert
-        root = tk.Tk()
-        root.withdraw()
-        scoremsg = messagebox.showinfo("Alert", "Red Scored!")
-        if scoreLeft == 7:
-            messagebox.showinfo("Alert", "Red Wins!")
-            time.sleep(2)
-            break
-        ball.rect.x = 445
-        ball.rect.y = 195
-        time.sleep(2)
-        ball.velocity[0] = -ball.velocity[0]
-    if ball.rect.x <= 0:
-        scoreRight += 1
-        root = tk.Tk()
-        root.withdraw()
-        messagebox.showinfo("Alert", "Blue Scored!")
-        if scoreRight == 7:
-            messagebox.showinfo("Alert", "Red Wins!")
-            time.sleep(2)
-            break
-        ball.rect.x = 445
-        ball.rect.y = 195
-        time.sleep(2)
-        ball.velocity[0] = -ball.velocity[0]
-
-    # reverse y-bound on collision with top or bottom
-    if ball.rect.y >= 490:
-        ball.velocity[1] = -ball.velocity[1]
-    if ball.rect.y <= 0:
-        ball.velocity[1] = -ball.velocity[1]
-
-    # check for paddle hit
-    if pygame.sprite.collide_mask(ball, paddleLeft) or pygame.sprite.collide_mask(ball, paddleRight):
-        ball.bounce()
-
-    # display scores
-    font = pygame.font.SysFont("impact.ttf", 50)
-    text = font.render(str(scoreLeft), 1, Red)
-    screen.blit(text, (420, 10))
-    text = font.render(str(scoreRight), 1, Blue)
-    screen.blit(text, (460, 10))
-
-    # --update screen with drawings
-    pygame.display.flip()
-
-    # --60 fps limit
-    clock.tick(60)
-
-# stop program once main loop is exited
-pygame.quit()
+# to the functionality, we will have a while loop that will listen to user inputs, adding logic to the game (score,
+# boundaries, etc.), and refreshing the program global "running" funtion that will control the while loop, simple bool
+class game():
 
 
-def send_data(self):
-    """
-    Send position to server
-    :return: None
-    """
-    data = str(self.net.id) + ":" + str(paddleLeft) + "," + str(paddleRight) + str(ball)
-    reply = self.net.send(data)
-    return reply
+    def __init__(self, paddleLeft, paddleRight, ball):
+        self.net = Network()
+        self.paddleLeft = paddleLeft
+        self.paddleRight = paddleRight
+        self.ball = ball
 
+    def run(self):
+        running = True
 
-@staticmethod
-def parse_data(data):
-    try:
-        d = data.split(":")[1].split(",")
-        return int(d[0]), int(d[1])
-    except:
-        return 0, 0
+        # need a clock for refreshing the screen (included in pygame package)
+        clock = pygame.time.Clock()
+
+        # scores for each side
+        scoreLeft = 0
+        scoreRight = 0
+
+        # start loop
+        while running:
+
+            size = (900, 500)
+            screen = pygame.display.set_mode(size)
+            pygame.display.set_caption("Multiplayer Pong")
+
+            # --listen for inputs
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:  # if quit button is pressed, leave
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_x:
+                        running = False
+
+                # keyboard inputs
+                key = pygame.key.get_pressed()
+                if key[pygame.K_UP]:
+                    self.paddleLeft.mUp(5)
+                if key[pygame.K_UP]:
+                    self.paddleLeft.mDown(5)
+                if key[pygame.K_UP]:
+                    self.paddleRight.mUp(5)
+                if key[pygame.K_DOWN]:
+                    self.paddleRight.mDown(5)
+
+                # --logic
+                allSprites.update()
+
+                # --drawing here (paddles, screen, scores, boundaries, etc
+                screen.fill(Black)
+                pygame.draw.line(screen, White, [448, 0], [448, 500], 4)
+
+                allSprites.draw(screen)
+
+                # check for left/right wall bounce - The sequence of events looks like this:
+                # Check if ball hiit wall behind paddle
+                # add to score, if score = 7, break from loop and end game
+                # reset ball, wait for a second
+                # send ball in direction of the play who scored last
+
+                if ball.rect.x >= 890:
+                    scoreLeft += 1
+                    # messgae box using tkinter, delete the root window as soon as it shows up, then display alert
+                    root = tk.Tk()
+                    root.withdraw()
+                    messagebox.showinfo("Alert", "Red Scored!")
+                    if scoreLeft == 7:
+                        messagebox.showinfo("Alert", "Red Wins!")
+                        time.sleep(2)
+                        break
+                    ball.rect.x = 445
+                    ball.rect.y = 195
+                    time.sleep(2)
+                    ball.velocity[0] = -ball.velocity[0]
+                if ball.rect.x <= 0:
+                    scoreRight += 1
+                    root = tk.Tk()
+                    root.withdraw()
+                    messagebox.showinfo("Alert", "Blue Scored!")
+                    if scoreRight == 7:
+                        messagebox.showinfo("Alert", "Red Wins!")
+                        time.sleep(2)
+                        break
+                    ball.rect.x = 445
+                    ball.rect.y = 195
+                    time.sleep(2)
+                    ball.velocity[0] = -ball.velocity[0]
+
+                # reverse y-bound on collision with top or bottom
+                if ball.rect.y >= 490:
+                    ball.velocity[1] = -ball.velocity[1]
+                if ball.rect.y <= 0:
+                    ball.velocity[1] = -ball.velocity[1]
+
+                # check for paddle hit
+                if pygame.sprite.collide_mask(ball, paddleLeft) or pygame.sprite.collide_mask(ball, paddleRight):
+                    ball.bounce()
+
+                # display scores
+                '''
+                font = pygame.font.SysFont(, 50)
+                text = font.render(str(scoreLeft), 1, Red)
+                screen.blit(text, (420, 10))
+                text = font.render(str(scoreRight), 1, Blue)
+                screen.blit(text, (460, 10))
+                '''
+                # --update screen with drawings
+                pygame.display.flip()
+
+                # --60 fps limit
+                clock.tick(60)
+
+                self.paddleLeft, self.paddleRight, self.ball = self.parse_data(self.send_data())
+
+            # stop program once main loop is exited
+            pygame.quit()
+
+    def send_data(self):
+        """
+                   Send position to server
+                   :return: None
+                   """
+        data = str(self.net.id) + ":" + str(self.paddleLeft) + "," + str(self.paddleRight) + "," + str(self.ball)
+        reply = self.net.send(data)
+        return reply
+        pass
+
+    @staticmethod
+    def parse_data(data):
+        try:
+            d = data.split(":")[1].split(",")[2]
+            return int(d[0]), int(d[1], int(d[2]))
+        except:
+            return 0, 0, 0
+        pass
