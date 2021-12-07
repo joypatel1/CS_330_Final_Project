@@ -147,3 +147,22 @@ while running:
 
 # stop program once main loop is exited
 pygame.quit()
+
+
+def send_data(self):
+    """
+    Send position to server
+    :return: None
+    """
+    data = str(self.net.id) + ":" + str(paddleLeft) + "," + str(paddleRight) + str(ball)
+    reply = self.net.send(data)
+    return reply
+
+
+@staticmethod
+def parse_data(data):
+    try:
+        d = data.split(":")[1].split(",")
+        return int(d[0]), int(d[1])
+    except:
+        return 0, 0
