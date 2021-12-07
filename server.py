@@ -1,65 +1,58 @@
-# https://www.youtube.com/watch?v=_whymdfq-R4 - Youtube Toutorial on how to create a server in python.
 import socket
 from _thread import *
 import sys
 
-# Locol server address
-server = "10.240.1.182"
-
-# port used to connect
-port = 5555
-
-# socket setup with types of connection
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+server = ''
+port = 5555
+
+server_ip = socket.gethostbyname(server)
+
 try:
-    # binding server and port to look for server
     s.bind((server, port))
+
 except socket.error as e:
-    str(e)
+    print(str(e))
 
-# listening for connections
 s.listen(2)
-print("Please wait to be connected to the server.")
+print("Waiting for a connection")
 
-
-# threading function
+currentId = "0"
+pos = ["0:20,200", "1:870,200"]
 def threaded_client(conn):
-    conn.send(str.encode("Connected"))
-    reply = ""
-
-    # continously looking for new connection.
+    global currentId, pos
+    conn.send(str.encode(currentId))
+    currentId = "1"
+    reply = ''
     while True:
         try:
-            # recieving data from connection specified as bits
             data = conn.recv(2048)
-
-            # decoding data
-            reply = data.decode("utf-8")
-
-            # disconnects user if there is no data to stop infinite loops
+            reply = data.decode('utf-8')
             if not data:
-                print("Disconnected")
+                conn.send(str.encode("Goodbye"))
                 break
-
             else:
-                print("Received: ", reply)
-                print("Sending: ", reply)
+                print("Recieved: " + reply)
+                arr = reply.split(":")
+                id = int(arr[0])
+                pos[id] = reply
 
-            # encodes data into bytes
+                if id == 0: nid = 1
+                if id == 1: nid = 0
+
+                reply = pos[nid][:]
+                print("Sending: " + reply)
+
             conn.sendall(str.encode(reply))
-
         except:
             break
 
     print("Connection Closed")
     conn.close()
 
-
 while True:
-    # accepting new connections
     conn, addr = s.accept()
-    print("Succefully connected to:", addr)
+    print("Connected to: ", addr)
 
-    # create new thread
     start_new_thread(threaded_client, (conn,))
