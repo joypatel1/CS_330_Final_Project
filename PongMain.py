@@ -13,6 +13,7 @@ import pygame
 from network import Network
 from paddle import Paddle
 # import ball
+
 from ball import Ball
 import tkinter as tk
 from tkinter import messagebox
@@ -54,12 +55,27 @@ pygame.display.set_caption("Multiplayer Pong")
 # boundaries, etc.), and refreshing the program global "running" funtion that will control the while loop, simple bool
 class game():
 
-
     def __init__(self, paddleLeft, paddleRight, ball):
+        self.rect = None
         self.net = Network()
         self.paddleLeft = paddleLeft
         self.paddleRight = paddleRight
         self.ball = ball
+        self.velocity = 2
+
+    def mUp(self, pixels):
+        self.rect.y -= pixels
+        # dont go off screen
+        if self.rect.y < 0:
+            self.rect.y = 0
+
+    # move down function, alike above function
+    def mDown(self, pixels):
+        self.rect.y += pixels
+        if self.rect.y > 400:
+            self.rect.y = 400
+
+
 
     def run(self):
         running = True
@@ -89,14 +105,14 @@ class game():
 
                 # keyboard inputs
                 key = pygame.key.get_pressed()
+                if key[pygame.K_w]:
+                    paddleLeft.mUp(5)
+                if key[pygame.K_s]:
+                    paddleLeft.mDown(5)
                 if key[pygame.K_UP]:
-                    self.paddleLeft.mUp(5)
-                if key[pygame.K_UP]:
-                    self.paddleLeft.mDown(5)
-                if key[pygame.K_UP]:
-                    self.paddleRight.mUp(5)
+                    paddleRight.mUp(5)
                 if key[pygame.K_DOWN]:
-                    self.paddleRight.mDown(5)
+                    paddleRight.mDown(5)
 
                 # --logic
                 allSprites.update()
@@ -116,11 +132,7 @@ class game():
                 if ball.rect.x >= 890:
                     scoreLeft += 1
                     # messgae box using tkinter, delete the root window as soon as it shows up, then display alert
-                    root = tk.Tk()
-                    root.withdraw()
-                    messagebox.showinfo("Alert", "Red Scored!")
                     if scoreLeft == 7:
-                        messagebox.showinfo("Alert", "Red Wins!")
                         time.sleep(2)
                         break
                     ball.rect.x = 445
@@ -129,11 +141,7 @@ class game():
                     ball.velocity[0] = -ball.velocity[0]
                 if ball.rect.x <= 0:
                     scoreRight += 1
-                    root = tk.Tk()
-                    root.withdraw()
-                    messagebox.showinfo("Alert", "Blue Scored!")
                     if scoreRight == 7:
-                        messagebox.showinfo("Alert", "Red Wins!")
                         time.sleep(2)
                         break
                     ball.rect.x = 445
@@ -171,10 +179,6 @@ class game():
             pygame.quit()
 
     def send_data(self):
-        """
-                   Send position to server
-                   :return: None
-                   """
         data = str(self.net.id) + ":" + str(self.paddleLeft) + "," + str(self.paddleRight) + "," + str(self.ball)
         reply = self.net.send(data)
         return reply
