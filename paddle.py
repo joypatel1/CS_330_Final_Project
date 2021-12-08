@@ -16,6 +16,8 @@ class Paddle(pygame.sprite.Sprite):
 		super().__init__()
 		
 		#now prep the padde object (setting coordinates, width and height)
+		self.y = None
+		self.x = None
 		self.image = pygame.Surface([width,height])
 		self.image.fill(Black)
 		self.image.set_colorkey(Black)

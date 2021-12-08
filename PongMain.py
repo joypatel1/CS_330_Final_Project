@@ -47,13 +47,18 @@ allSprites.add(ball)
 
 # set game window
 size = (900, 500)
-screen = pygame.display.set_mode(size)
 pygame.display.set_caption("Multiplayer Pong")
+
+
 
 
 # to the functionality, we will have a while loop that will listen to user inputs, adding logic to the game (score,
 # boundaries, etc.), and refreshing the program global "running" funtion that will control the while loop, simple bool
 class game():
+    size = (900, 500)
+    screen = pygame.display.set_mode(size)
+    pygame.display.set_caption("Multiplayer Pong")
+
 
     def __init__(self, paddleLeft, paddleRight, ball):
         self.rect = None
@@ -62,6 +67,10 @@ class game():
         self.paddleRight = paddleRight
         self.ball = ball
         self.velocity = 2
+        self.width = 900
+        self.height = 500
+
+
 
     def mUp(self, pixels):
         self.rect.y -= pixels
@@ -78,6 +87,7 @@ class game():
 
 
     def run(self):
+
         running = True
 
         # need a clock for refreshing the screen (included in pygame package)
@@ -87,13 +97,11 @@ class game():
         scoreLeft = 0
         scoreRight = 0
 
+
+
         # start loop
         while running:
-
-            size = (900, 500)
             screen = pygame.display.set_mode(size)
-            pygame.display.set_caption("Multiplayer Pong")
-
             # --listen for inputs
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:  # if quit button is pressed, leave
@@ -169,11 +177,10 @@ class game():
                 '''
                 # --update screen with drawings
                 pygame.display.flip()
-
                 # --60 fps limit
                 clock.tick(60)
 
-                self.paddleLeft, self.paddleRight, self.ball = self.parse_data(self.send_data())
+                self.paddleLeft, self.paddleLeft, self.ball = self.parse_data(self.send_data())
 
             # stop program once main loop is exited
             pygame.quit()
