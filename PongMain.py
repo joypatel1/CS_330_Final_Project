@@ -50,15 +50,12 @@ size = (900, 500)
 pygame.display.set_caption("Multiplayer Pong")
 
 
-
-
 # to the functionality, we will have a while loop that will listen to user inputs, adding logic to the game (score,
 # boundaries, etc.), and refreshing the program global "running" funtion that will control the while loop, simple bool
 class game():
     size = (900, 500)
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption("Multiplayer Pong")
-
 
     def __init__(self, paddleLeft, paddleRight, ball):
         self.rect = None
@@ -69,8 +66,6 @@ class game():
         self.velocity = 2
         self.width = 900
         self.height = 500
-
-
 
     def mUp(self, pixels):
         self.rect.y -= pixels
@@ -84,8 +79,6 @@ class game():
         if self.rect.y > 400:
             self.rect.y = 400
 
-
-
     def run(self):
 
         running = True
@@ -96,8 +89,6 @@ class game():
         # scores for each side
         scoreLeft = 0
         scoreRight = 0
-
-
 
         # start loop
         while running:
@@ -194,7 +185,7 @@ class game():
     @staticmethod
     def parse_data(data):
         try:
-            d = data.split(":")[1].split(",")[2]
+            d = data.split(":")[1].split(",")
             return int(d[0]), int(d[1], int(d[2]))
         except:
             return 0, 0, 0
