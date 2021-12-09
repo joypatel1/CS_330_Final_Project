@@ -3,6 +3,7 @@ import socket
 
 class Network:
 
+    #Initialize the network
     def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.host = "10.240.1.182"
@@ -15,10 +16,7 @@ class Network:
         return self.client.recv(2048).decode()
 
     def send(self, data):
-        """
-        :param data: str
-        :return: str
-        """
+
         try:
             self.client.send(str.encode(data))
             reply = self.client.recv(2048).decode()
